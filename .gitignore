@@ -1,0 +1,59 @@
+# --- Node / frontend ---
+node_modules/
+.next/
+out/
+frontend/.env*.local
+*.tsbuildinfo
+next-env.d.ts
+
+# --- Python / backend ---
+__pycache__/
+*.pyc
+.venv/
+backend/.venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Env / secrets ---
+.env
+.env.*
+!.env.example
+!frontend/.env.example
+!backend/.env.example
+
+# --- Data (real ARGO/WOA23/SST files — never commit raw archives) ---
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+*.nc
+*.parquet
+
+# --- Claude Code local tooling (skills are downloaded third-party content, not app source) ---
+.claude/
+
+# --- Large source assets not meant for GitHub ---
+*.pptx
+presentation/
+
+# --- Internal working docs (session logs, build plans) — not part of the public repo ---
+docs/
+PLAN.md
+PROGRESS.md
+REDESIGN_PLAN.md
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- Misc build artifacts ---
+dist/
+build/
+*.log
+
+# User-provided design reference images (not project deliverables)
+float ref.jfif

@@ -1,0 +1,256 @@
+@import "tailwindcss";
+
+/*
+ * FLOATCHAT "Field Notebook" palette (REDESIGN_PLAN.md, decided 2026-09-13 after the first
+ * Phase 1 pass was rejected for being blue-on-blue). Cream paper UI, graphite type, cobalt for
+ * anything interactive, coral reserved strictly for anomalies/heat, sand continents on
+ * ink-green water with gold sun glints. Single light theme — this is a chart/case-file, not a
+ * dark dashboard, so there is deliberately no prefers-color-scheme branch.
+ */
+:root {
+  --paper: #f3ede0;
+  --paper-2: #ebe3d2;
+  --paper-3: #e1d7c2;
+  --graphite: #1a1a1a;
+  --graphite-2: #4a4a48;
+  --graphite-3: #8a877f;
+  --line: rgba(26, 26, 26, 0.12);
+  --line-strong: rgba(26, 26, 26, 0.28);
+  --cobalt: #1d4ed8;
+  --cobalt-soft: rgba(29, 78, 216, 0.12);
+  --coral: #f0562f;
+  --coral-soft: rgba(240, 86, 47, 0.14);
+  --sand: #d9c9a3;
+  --sand-2: #c9b78d;
+  --ink: #0b2f3a;
+  --ink-2: #1b5e6b;
+  --gold: #f4c95d;
+
+  /* Legacy aliases still referenced by a few components — mapped onto the new palette. */
+  --color-bg: var(--paper);
+  --color-bg-elevated: #fbf8f1;
+  --color-foreground: var(--graphite);
+  --color-muted: var(--graphite-3);
+  --color-accent: var(--cobalt);
+  --color-accent-soft: var(--cobalt-soft);
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-paper-3: var(--paper-3);
+  --color-graphite: var(--graphite);
+  --color-graphite-2: var(--graphite-2);
+  --color-graphite-3: var(--graphite-3);
+  --color-cobalt: var(--cobalt);
+  --color-coral: var(--coral);
+  --color-sand: var(--sand);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-gold: var(--gold);
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-foreground);
+  --color-muted: var(--color-muted);
+  --color-accent: var(--color-accent);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-display);
+}
+
+body {
+  background: var(--paper);
+  color: var(--graphite);
+}
+
+/* Faint graph-paper grid — the "pinned to a chart" background every awwwards reference sat
+   its cards on, instead of black glass panels floating over the scene. */
+.paper-grid {
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(to right, rgba(26, 26, 26, 0.055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(26, 26, 26, 0.055) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* A paper card: warm white, hairline border, one soft shadow. Hover lifts it. */
+.card {
+  background: rgba(251, 248, 241, 0.94);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6) inset,
+    0 10px 30px -18px rgba(26, 26, 26, 0.35);
+  backdrop-filter: blur(6px);
+}
+.card-hover {
+  transition:
+    transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 220ms;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  border-color: var(--line-strong);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6) inset,
+    0 18px 40px -20px rgba(26, 26, 26, 0.45);
+}
+
+/* Small caps label used for section eyebrows and data captions. */
+.eyebrow {
+  font-family: var(--font-geist-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--graphite-3);
+}
+
+/* Chunky pill button with a hard shadow (the Decathlon/Illoca CTA feel). */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  border: 1px solid var(--graphite);
+  background: var(--paper);
+  color: var(--graphite);
+  box-shadow: 2px 2px 0 var(--graphite);
+  transition:
+    transform 120ms,
+    box-shadow 120ms,
+    background 120ms;
+}
+.btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--graphite);
+}
+.btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--graphite);
+}
+.btn-primary {
+  background: var(--cobalt);
+  color: #fff;
+  border-color: var(--cobalt);
+  box-shadow: 2px 2px 0 var(--graphite);
+}
+.btn-ghost {
+  border-color: var(--line-strong);
+  box-shadow: none;
+  background: transparent;
+}
+.btn-ghost:hover {
+  background: rgba(26, 26, 26, 0.05);
+  box-shadow: none;
+  transform: none;
+}
+.btn:disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* Hand-drawn annotation text (the "not software →" scribbles). */
+.annotation {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--graphite-2);
+}
+
+input[type="range"].scrubber {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 2px;
+  background: var(--line-strong);
+  border-radius: 999px;
+}
+input[type="range"].scrubber::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 2px solid var(--graphite);
+  box-shadow: 2px 2px 0 var(--graphite);
+  cursor: grab;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+.ripple::before,
+.ripple::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 1.5px solid var(--cobalt);
+  animation: ripple 1.6s ease-out infinite;
+}
+.ripple::after {
+  animation-delay: 0.8s;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.rise {
+  animation: rise 360ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* Corkboard evidence chain (EvidencePanel/CorkboardEvidence.tsx). */
+@keyframes cork-draw {
+  from {
+    stroke-dashoffset: 220;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.cork-string {
+  animation: cork-draw 500ms ease-out forwards;
+}
+@keyframes cork-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.5) rotate(-6deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+.cork-pop {
+  animation: cork-pop 320ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes cork-nudge {
+  0%,
+  100% {
+    r: 7;
+  }
+  50% {
+    r: 8.5;
+  }
+}
+.cork-nudge {
+  animation: cork-nudge 1.4s ease-in-out infinite;
+}
