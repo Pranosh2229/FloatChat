@@ -1,24 +1,16 @@
 import * as THREE from "three";
 
 import { CURVATURE_GLSL, curvatureUniforms } from "./worldCurvature";
+import { DAY_PALETTE, type WorldPalette } from "./worldTheme";
 
 /**
  * Procedural ocean surface (replaces the tiled GLB from the first Phase 1 pass, which read as
  * "square plots" — see REDESIGN_PLAN.md). One continuous plane: the vertex shader stacks four
  * Gerstner-style swells in *world* space so the surface is seamless no matter where the plane
  * is moved to; the fragment shader adds fine ripple normals, a fresnel blend from deep ink
- * (looking down) to a pale horizon (grazing), and a tight gold sun glint. Colours follow the
- * Field Notebook palette.
+ * (looking down) to a pale horizon (grazing), and a tight gold sun glint. Colours (day or night —
+ * see worldTheme.ts) follow the Field Notebook palette; the wave animation itself never changes.
  */
-
-export const WATER_COLORS = {
-  deep: new THREE.Color("#0b2f3a"),
-  lit: new THREE.Color("#1b5e6b"),
-  horizon: new THREE.Color("#c9d1c9"),
-  glint: new THREE.Color("#f4c95d"),
-};
-
-export const SUN_DIRECTION = new THREE.Vector3(0.45, 0.55, -0.7).normalize();
 
 export const waterVertexShader = /* glsl */ `
   uniform float uTime;
@@ -122,17 +114,19 @@ export const waterFragmentShader = /* glsl */ `
   }
 `;
 
-/** Props for an R3F `<shaderMaterial>` — built fresh per call so each mesh owns its uniforms. */
-export function waterMaterialProps() {
+/** Props for an R3F `<shaderMaterial>` — built fresh per call so each mesh owns its uniforms.
+ * Takes the palette to start from (day by default); `OceanSurface.tsx` mutates the colour
+ * uniforms in place afterward when the theme changes, same as it already does for `uTime`. */
+export function waterMaterialProps(palette: WorldPalette = DAY_PALETTE) {
   const uniforms = THREE.UniformsUtils.merge([
       THREE.UniformsLib.fog,
       {
         uTime: { value: 0 },
-        uDeep: { value: WATER_COLORS.deep },
-        uLit: { value: WATER_COLORS.lit },
-        uHorizon: { value: WATER_COLORS.horizon },
-        uGlint: { value: WATER_COLORS.glint },
-        uSunDir: { value: SUN_DIRECTION },
+        uDeep: { value: palette.water.deep.clone() },
+        uLit: { value: palette.water.lit.clone() },
+        uHorizon: { value: palette.water.horizon.clone() },
+        uGlint: { value: palette.water.glint.clone() },
+        uSunDir: { value: palette.sunDirection.clone() },
       },
   ]);
   // Shared objects (not merged copies) so WorldNavigator's per-frame update reaches this too.

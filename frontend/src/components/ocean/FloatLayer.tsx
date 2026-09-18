@@ -11,6 +11,7 @@ import { latLonToWorld } from "./geo";
 import { cameraRig } from "./worldCamera";
 import { buildArgoFloatParts } from "./argoFloatParts";
 import { bendMaterial } from "./worldCurvature";
+import { getWorldPalette } from "./worldTheme";
 
 interface Placement {
   float: FloatSummary;
@@ -83,7 +84,9 @@ export function FloatLayer({ reducedMotion }: { reducedMotion: boolean }) {
   const highlightedFloatIds = useOceanStore((s) => s.highlightedFloatIds);
   const primaryFloatId = useOceanStore((s) => s.primaryFloatId);
   const discoveryEvents = useOceanStore((s) => s.discoveryEvents);
+  const theme = useOceanStore((s) => s.theme);
   const gl = useThree((state) => state.gl);
+  const palette = getWorldPalette(theme);
 
   const parts = useMemo(() => {
     const built = buildArgoFloatParts();
@@ -200,7 +203,9 @@ export function FloatLayer({ reducedMotion }: { reducedMotion: boolean }) {
           ))}
         </Instances>
       ))}
-      {selected && <SelectionGlow position={selected.position} reducedMotion={reducedMotion} />}
+      {selected && (
+        <SelectionGlow position={selected.position} reducedMotion={reducedMotion} color={palette.marker.cobalt} />
+      )}
       {primary && <PrimaryGlow position={primary.position} reducedMotion={reducedMotion} />}
       {highlighted.map(({ float, position }) => (
         <SelectionGlow
@@ -212,7 +217,12 @@ export function FloatLayer({ reducedMotion }: { reducedMotion: boolean }) {
         />
       ))}
       {hovered && (
-        <SelectionGlow position={hovered.position} reducedMotion={reducedMotion} color="#1a1a1a" radius={[0.022, 0.027]} />
+        <SelectionGlow
+          position={hovered.position}
+          reducedMotion={reducedMotion}
+          color={palette.marker.glow}
+          radius={[0.022, 0.027]}
+        />
       )}
       {!reducedMotion &&
         idlePulseTargets.map(({ float, position }) => (

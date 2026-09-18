@@ -4,13 +4,23 @@
  * FLOATCHAT "Field Notebook" palette (REDESIGN_PLAN.md, decided 2026-09-13 after the first
  * Phase 1 pass was rejected for being blue-on-blue). Cream paper UI, graphite type, cobalt for
  * anything interactive, coral reserved strictly for anomalies/heat, sand continents on
- * ink-green water with gold sun glints. Single light theme — this is a chart/case-file, not a
- * dark dashboard, so there is deliberately no prefers-color-scheme branch.
+ * ink-green water with gold sun glints.
+ *
+ * A dark "night notebook" variant was added 2026-09-19 (same field notebook, read after dark —
+ * deep charcoal paper, not pure black, so it still reads as paper rather than glass/OLED-black).
+ * Toggled via `data-theme` on <html> by `ThemeInit.tsx` off `oceanStore.theme` (persisted, not a
+ * `prefers-color-scheme` branch — a deliberate user choice, not an OS-inherited one). Every one
+ * of these tokens has a dark override below; a component drawing ink-black line art (inline SVG
+ * illustrations, mini-maps) should reference `var(--graphite)`/`var(--paper)` directly rather
+ * than a hardcoded hex, precisely so dark mode keeps it legible — see `worldTheme.ts` for the
+ * equivalent swap the 3D ocean scene (water/fog/land/lighting) makes, since Three.js materials
+ * can't read CSS custom properties directly.
  */
 :root {
   --paper: #f3ede0;
   --paper-2: #ebe3d2;
   --paper-3: #e1d7c2;
+  --card-bg: rgba(251, 248, 241, 0.94);
   --graphite: #1a1a1a;
   --graphite-2: #4a4a48;
   --graphite-3: #8a877f;
@@ -25,10 +35,45 @@
   --ink: #0b2f3a;
   --ink-2: #1b5e6b;
   --gold: #f4c95d;
+  --grid-line: rgba(26, 26, 26, 0.055);
+  --hover-tint: rgba(26, 26, 26, 0.05);
 
   /* Legacy aliases still referenced by a few components — mapped onto the new palette. */
   --color-bg: var(--paper);
   --color-bg-elevated: #fbf8f1;
+  --color-foreground: var(--graphite);
+  --color-muted: var(--graphite-3);
+  --color-accent: var(--cobalt);
+  --color-accent-soft: var(--cobalt-soft);
+}
+
+/* Deep charcoal, not black — keeps the "paper" warmth of the light theme instead of going
+   OLED/glass. Text becomes the old paper cream; hairlines lighten; cobalt/coral brighten a touch
+   since saturated colour reads darker against a dark ground than it does against cream. */
+:root[data-theme="dark"] {
+  --paper: #1c1a17;
+  --paper-2: #262320;
+  --paper-3: #302c27;
+  --card-bg: rgba(38, 35, 32, 0.92);
+  --graphite: #f0ead9;
+  --graphite-2: #c9c0ac;
+  --graphite-3: #8f8672;
+  --line: rgba(240, 234, 217, 0.12);
+  --line-strong: rgba(240, 234, 217, 0.26);
+  --cobalt: #5b8dff;
+  --cobalt-soft: rgba(91, 141, 255, 0.18);
+  --coral: #ff7a52;
+  --coral-soft: rgba(255, 122, 82, 0.18);
+  --sand: #8c7c5c;
+  --sand-2: #6e6046;
+  --ink: #050f14;
+  --ink-2: #0d2b33;
+  --gold: #f4c95d;
+  --grid-line: rgba(240, 234, 217, 0.06);
+  --hover-tint: rgba(240, 234, 217, 0.08);
+
+  --color-bg: var(--paper);
+  --color-bg-elevated: #2a2621;
   --color-foreground: var(--graphite);
   --color-muted: var(--graphite-3);
   --color-accent: var(--cobalt);
@@ -67,14 +112,14 @@ body {
 .paper-grid {
   background-color: var(--paper);
   background-image:
-    linear-gradient(to right, rgba(26, 26, 26, 0.055) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(26, 26, 26, 0.055) 1px, transparent 1px);
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
 /* A paper card: warm white, hairline border, one soft shadow. Hover lifts it. */
 .card {
-  background: rgba(251, 248, 241, 0.94);
+  background: var(--card-bg);
   border: 1px solid var(--line);
   border-radius: 14px;
   box-shadow:
@@ -144,7 +189,7 @@ body {
   background: transparent;
 }
 .btn-ghost:hover {
-  background: rgba(26, 26, 26, 0.05);
+  background: var(--hover-tint);
   box-shadow: none;
   transform: none;
 }

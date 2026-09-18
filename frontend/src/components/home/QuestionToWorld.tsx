@@ -113,8 +113,8 @@ export function QuestionToWorld() {
 
       <div className="grid sm:grid-cols-[1.2fr_1fr]">
         <svg viewBox="0 0 320 200" className="block w-full" role="img" aria-label="A small illustrated map of the Bay of Bengal with real ARGO floats highlighting">
-          <rect width="320" height="200" fill="#1b5e6b" />
-          <path d="M0 30 q40 -12 80 0 t80 0 t80 0 t80 0 v170 h-320z" fill="#0b2f3a" opacity="0.35" />
+          <rect width="320" height="200" fill="var(--ink-2)" />
+          <path d="M0 30 q40 -12 80 0 t80 0 t80 0 t80 0 v170 h-320z" fill="var(--ink)" opacity="0.35" />
           {FLOAT_DOTS.map(([x, y], i) => (
             <g
               key={i}
@@ -126,11 +126,11 @@ export function QuestionToWorld() {
                 transformOrigin: `${x}px ${y}px`,
               }}
             >
-              <circle cx={x} cy={y} r="10" fill="none" stroke="#f0562f" strokeWidth="2.5" />
-              <rect x={x - 3} y={y - 10} width="6" height="16" rx="2" fill="#f4c95d" stroke="#1a1a1a" strokeWidth="1.5" />
+              <circle cx={x} cy={y} r="10" fill="none" stroke="var(--coral)" strokeWidth="2.5" />
+              <rect x={x - 3} y={y - 10} width="6" height="16" rx="2" fill="var(--gold)" stroke="var(--graphite)" strokeWidth="1.5" />
             </g>
           ))}
-          <text x="16" y="184" fontFamily="var(--font-geist-mono)" fontSize="10" fill="#f3ede0" letterSpacing="1.5" opacity="0.85">
+          <text x="16" y="184" fontFamily="var(--font-geist-mono)" fontSize="10" fill="var(--paper)" letterSpacing="1.5" opacity="0.85">
             BAY OF BENGAL
           </text>
         </svg>

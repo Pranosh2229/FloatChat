@@ -9,6 +9,8 @@ import { EVENT_EXPLAINERS } from "@/lib/explainers";
 import { useOceanStore } from "@/stores/oceanStore";
 import { regionCentroid } from "@/components/ocean/geo";
 import { Reveal } from "@/components/home/Reveal";
+import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
+import { ExportMenu } from "@/components/ui/ExportMenu";
 
 const TYPE_COLORS: Record<string, string> = {
   surface_warming: "#f0562f",
@@ -63,6 +65,7 @@ export default function DashboardPage() {
   const [events, setEvents] = useState<EventSummary[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [land, setLand] = useState<LandPolygon[] | null>(null);
+  const [regionQuery, setRegionQuery] = useState("");
   const regions = useOceanStore((s) => s.regions);
   const loadRegions = useOceanStore((s) => s.loadRegions);
   const setFlyTo = useOceanStore((s) => s.setFlyToTarget);
@@ -99,6 +102,9 @@ export default function DashboardPage() {
   }, [events]);
   const maxMonth = Math.max(1, ...byMonth.map(([, n]) => n));
 
+  const regionQueryLower = regionQuery.trim().toLowerCase();
+  const matchesRegionQuery = (name: string) => !regionQueryLower || name.toLowerCase().includes(regionQueryLower);
+
   const dominant = byType[0];
   const regionsWithEvents = stats ? stats.regions.filter((r) => r.event_count > 0).length : 0;
   const depthiest = events.length
@@ -108,12 +114,32 @@ export default function DashboardPage() {
   return (
     <main className="paper-grid min-h-dvh px-6 pb-24 pt-28 sm:px-12">
       <div className="mx-auto max-w-6xl">
-        <p className="eyebrow">Mission control</p>
-        <h1 className="mt-2 font-display text-[clamp(40px,6vw,72px)] leading-none">The whole picture.</h1>
-        <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-[var(--graphite-2)]">
-          Everything FloatChat knows right now, in one place: where the robots are, how much they have
-          measured, and where the ocean has stepped outside its normal range.
-        </p>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="eyebrow">Mission control</p>
+            <h1 className="mt-2 font-display text-[clamp(40px,6vw,72px)] leading-none">The whole picture.</h1>
+            <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-[var(--graphite-2)]">
+              Everything FloatChat knows right now, in one place: where the robots are, how much they have
+              measured, and where the ocean has stepped outside its normal range.
+            </p>
+          </div>
+          <div className="flex flex-col items-end gap-2">
+            <DashboardSearch value={regionQuery} onChange={setRegionQuery} regions={regions} />
+            {stats && (
+              <ExportMenu
+                filename="floatchat-dashboard"
+                summary={`FloatChat — ${stats.total_floats} floats, ${stats.total_profiles} profiles, ${stats.total_events} events, ${stats.total_sst_points} satellite readings across ${stats.total_regions} regions. Most active: ${mostActive?.name ?? "—"} (${mostActive?.event_count ?? 0} events).`}
+                json={stats}
+                csvRows={stats.regions.map((r) => ({
+                  region: regionName(r.key),
+                  floats: r.float_count,
+                  profiles: r.profile_count,
+                  events: r.event_count,
+                }))}
+              />
+            )}
+          </div>
+        </div>
 
         {error && <p className="mt-4 text-sm text-[var(--coral)]">Couldn&apos;t load stats: {error}</p>}
 
@@ -121,8 +147,8 @@ export default function DashboardPage() {
         <Reveal className="mt-8">
           <div className="card overflow-hidden">
             <svg viewBox={`${box.minLon} ${-box.maxLat} ${box.maxLon - box.minLon} ${box.maxLat - box.minLat}`} className="h-auto w-full">
-              <rect x={box.minLon} y={-box.maxLat} width={360} height={box.maxLat - box.minLat} fill="#1b5e6b" />
-              {paths && <path d={paths} fill="#d9c9a3" stroke="#1a1a1a" strokeWidth={0.25} strokeOpacity={0.5} />}
+              <rect x={box.minLon} y={-box.maxLat} width={360} height={box.maxLat - box.minLat} fill="var(--ink-2)" />
+              {paths && <path d={paths} fill="var(--sand)" stroke="var(--graphite)" strokeWidth={0.25} strokeOpacity={0.5} />}
               {regions.map((region) => {
                 const s = stats?.regions.find((r) => r.key === region.key);
                 const cx = (region.min_lon + region.max_lon) / 2;
@@ -130,12 +156,12 @@ export default function DashboardPage() {
                 const r = 2 + (s ? (s.float_count / maxFloats) * 6 : 0);
                 return (
                   <g key={region.key}>
-                    <rect x={region.min_lon} y={-region.max_lat} width={region.max_lon - region.min_lon} height={region.max_lat - region.min_lat} fill="#f3ede0" fillOpacity={0.12} stroke="#f3ede0" strokeWidth={0.3} strokeDasharray="1.5 1" />
+                    <rect x={region.min_lon} y={-region.max_lat} width={region.max_lon - region.min_lon} height={region.max_lat - region.min_lat} fill="var(--paper)" fillOpacity={0.12} stroke="var(--paper)" strokeWidth={0.3} strokeDasharray="1.5 1" />
                     {s && s.event_count > 0 && (
-                      <circle cx={cx} cy={cy} r={r + 2 + Math.min(6, s.event_count / 8)} fill="none" stroke="#f0562f" strokeWidth={0.6} />
+                      <circle cx={cx} cy={cy} r={r + 2 + Math.min(6, s.event_count / 8)} fill="none" stroke="var(--coral)" strokeWidth={0.6} />
                     )}
-                    <circle cx={cx} cy={cy} r={r} fill="#f4c95d" stroke="#1a1a1a" strokeWidth={0.3} />
-                    <text x={cx} y={cy - r - 2.5} textAnchor="middle" fontSize={3.2} fill="#f3ede0" fontFamily="var(--font-geist-mono)" letterSpacing={0.4}>
+                    <circle cx={cx} cy={cy} r={r} fill="var(--gold)" stroke="var(--graphite)" strokeWidth={0.3} />
+                    <text x={cx} y={cy - r - 2.5} textAnchor="middle" fontSize={3.2} fill="var(--paper)" fontFamily="var(--font-geist-mono)" letterSpacing={0.4}>
                       {region.name.toUpperCase()}
                     </text>
                   </g>
@@ -205,6 +231,7 @@ export default function DashboardPage() {
               <p className="mt-1 text-[12px] text-[var(--graphite-3)]">Floats (gold) and dives (ink). More dives = a better-observed region.</p>
               <div className="mt-4 space-y-2.5">
                 {[...(stats?.regions ?? [])]
+                  .filter((r) => matchesRegionQuery(r.name))
                   .sort((a, b) => b.float_count - a.float_count)
                   .map((r) => (
                     <div key={r.key} className="space-y-1">
@@ -212,6 +239,9 @@ export default function DashboardPage() {
                       <BarRow label="" value={r.profile_count} max={maxProfiles} color="var(--ink-2)" caption={`${r.profile_count} ↧`} />
                     </div>
                   ))}
+                {regionQueryLower && !stats?.regions.some((r) => matchesRegionQuery(r.name)) && (
+                  <p className="text-[12px] text-[var(--graphite-3)]">No region matches &ldquo;{regionQuery}&rdquo;.</p>
+                )}
               </div>
             </div>
           </Reveal>
@@ -240,6 +270,7 @@ export default function DashboardPage() {
                 <p className="eyebrow">Events by region</p>
                 <div className="mt-3 space-y-2">
                   {[...(stats?.regions ?? [])]
+                    .filter((r) => matchesRegionQuery(r.name))
                     .sort((a, b) => b.event_count - a.event_count)
                     .map((r) => (
                       <BarRow key={r.key} label={r.name} value={r.event_count} max={maxEvents} color="var(--coral)" />

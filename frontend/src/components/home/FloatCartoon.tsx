@@ -4,9 +4,9 @@
  * inline SVG — no image files, crisp at any size, colours stay on-palette.
  */
 
-const INK = "#1a1a1a";
+const INK = "var(--graphite)";
 const GOLD = "#f4c95d";
-const PAPER = "#f3ede0";
+const PAPER = "var(--paper)";
 const WATER = "#1b5e6b";
 const DEEP = "#0b2f3a";
 const CORAL = "#f0562f";
@@ -140,7 +140,7 @@ export function FloatCycleStrip() {
       caption: "At the surface it beams the numbers to a satellite, then sinks to do it all again. Nobody steers it.",
       scene: (
         <>
-          <rect x="0" y="0" width="260" height="200" fill="#e8ebe2" />
+          <rect x="0" y="0" width="260" height="200" fill="var(--color-bg-elevated)" />
           <rect x="0" y="120" width="260" height="80" fill={WATER} />
           <Waves y={120} width={260} color={PAPER} />
           <Satellite x={200} y={40} />
@@ -173,7 +173,7 @@ export function FloatCycleStrip() {
 export function FloatHero() {
   return (
     <svg viewBox="0 0 520 360" className="block w-full" role="img" aria-label="A cartoon ARGO float at the sea surface talking to a satellite">
-      <rect width="520" height="360" fill="#e8ebe2" rx="18" />
+      <rect width="520" height="360" fill="var(--color-bg-elevated)" rx="18" />
       <circle cx="440" cy="70" r="30" fill={GOLD} stroke={INK} strokeWidth="3" />
       <path d="M0 250 q60 -20 120 -10 t140 0 t140 -6 t120 4 v130 h-520z" fill={SAND} stroke={INK} strokeWidth="0" opacity="0.5" />
       <rect x="0" y="230" width="520" height="130" fill={WATER} />

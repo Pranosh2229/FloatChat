@@ -12,10 +12,10 @@ const STEPS = [
     body: "“What’s unusual in the Tasman Sea?” is a valid question. So is “what is a thermocline?” or “how do you know?”",
     art: (
       <svg viewBox="0 0 200 110" className="w-full">
-        <rect x="10" y="30" width="180" height="44" rx="22" fill="#fbf8f1" stroke="#1a1a1a" strokeWidth="2.5" />
-        <circle cx="34" cy="52" r="5" fill="#1d4ed8" />
-        <path d="M52 52 h90" stroke="#1a1a1a" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="14 8" />
-        <rect x="150" y="38" width="32" height="28" rx="14" fill="#1d4ed8" />
+        <rect x="10" y="30" width="180" height="44" rx="22" fill="var(--color-bg-elevated)" stroke="var(--graphite)" strokeWidth="2.5" />
+        <circle cx="34" cy="52" r="5" fill="var(--cobalt)" />
+        <path d="M52 52 h90" stroke="var(--graphite)" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="14 8" />
+        <rect x="150" y="38" width="32" height="28" rx="14" fill="var(--cobalt)" />
         <path d="M160 52 h12 M168 47 l5 5 l-5 5" stroke="#fff" strokeWidth="2.5" fill="none" strokeLinecap="round" />
       </svg>
     ),
@@ -26,12 +26,12 @@ const STEPS = [
     body: "The camera flies to the place, the floats involved light up, the timeline jumps. The map is the answer, not a chat bubble.",
     art: (
       <svg viewBox="0 0 200 110" className="w-full">
-        <rect x="10" y="10" width="180" height="90" rx="10" fill="#1b5e6b" />
-        <path d="M20 60 q30 -25 60 -10 t60 -10 t50 5 v45 h-170z" fill="#d9c9a3" opacity="0.9" />
+        <rect x="10" y="10" width="180" height="90" rx="10" fill="var(--ink-2)" />
+        <path d="M20 60 q30 -25 60 -10 t60 -10 t50 5 v45 h-170z" fill="var(--sand)" opacity="0.9" />
         {[[60, 40], [110, 30], [140, 48], [85, 22]].map(([x, y], i) => (
           <g key={i}>
-            <circle cx={x} cy={y} r="9" fill="none" stroke="#f0562f" strokeWidth="2" />
-            <rect x={x - 3} y={y - 9} width="6" height="14" rx="2" fill="#f4c95d" stroke="#1a1a1a" strokeWidth="1.5" />
+            <circle cx={x} cy={y} r="9" fill="none" stroke="var(--coral)" strokeWidth="2" />
+            <rect x={x - 3} y={y - 9} width="6" height="14" rx="2" fill="var(--gold)" stroke="var(--graphite)" strokeWidth="1.5" />
           </g>
         ))}
       </svg>
@@ -43,13 +43,13 @@ const STEPS = [
     body: "Every conclusion traces back to real dives, real readings and a real long-term baseline. If we don’t know why, we say so.",
     art: (
       <svg viewBox="0 0 200 110" className="w-full">
-        <rect x="30" y="14" width="140" height="84" rx="8" fill="#fbf8f1" stroke="#1a1a1a" strokeWidth="2.5" />
-        <rect x="30" y="14" width="60" height="16" rx="4" fill="#f0562f" />
-        <path d="M44 48 h80 M44 60 h60" stroke="#1a1a1a" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
-        <rect x="44" y="72" width="70" height="8" rx="4" fill="#f0562f" />
-        <rect x="44" y="84" width="40" height="8" rx="4" fill="#4a4a48" />
-        <circle cx="150" cy="78" r="12" fill="#f4c95d" stroke="#1a1a1a" strokeWidth="2.5" />
-        <path d="M144 78 l4 4 l8 -9" stroke="#1a1a1a" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+        <rect x="30" y="14" width="140" height="84" rx="8" fill="var(--color-bg-elevated)" stroke="var(--graphite)" strokeWidth="2.5" />
+        <rect x="30" y="14" width="60" height="16" rx="4" fill="var(--coral)" />
+        <path d="M44 48 h80 M44 60 h60" stroke="var(--graphite)" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
+        <rect x="44" y="72" width="70" height="8" rx="4" fill="var(--coral)" />
+        <rect x="44" y="84" width="40" height="8" rx="4" fill="var(--graphite-2)" />
+        <circle cx="150" cy="78" r="12" fill="var(--gold)" stroke="var(--graphite)" strokeWidth="2.5" />
+        <path d="M144 78 l4 4 l8 -9" stroke="var(--graphite)" strokeWidth="2.5" fill="none" strokeLinecap="round" />
       </svg>
     ),
   },

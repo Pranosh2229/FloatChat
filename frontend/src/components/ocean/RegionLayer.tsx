@@ -9,6 +9,7 @@ import { useOceanStore } from "@/stores/oceanStore";
 import { latLonToWorld, regionCentroid } from "./geo";
 import { cameraRig } from "./worldCamera";
 import { bendMaterial, curvatureDrop } from "./worldCurvature";
+import { getWorldPalette } from "./worldTheme";
 
 const OUTLINE_HEIGHT = 0.06;
 const worldPos = new THREE.Vector3();
@@ -25,6 +26,8 @@ const LABEL_FADE_END = 4.5;
  */
 export function RegionLayer() {
   const regions = useOceanStore((s) => s.regions);
+  const theme = useOceanStore((s) => s.theme);
+  const cobalt = getWorldPalette(theme).marker.cobalt;
   const labelRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
   const labelGroups = useRef<Map<string, THREE.Group | null>>(new Map());
 
@@ -87,7 +90,7 @@ export function RegionLayer() {
             </bufferGeometry>
             <lineBasicMaterial
               ref={bendMaterial}
-              color="#1d4ed8"
+              color={cobalt}
               transparent
               opacity={0.55}
               toneMapped={false}

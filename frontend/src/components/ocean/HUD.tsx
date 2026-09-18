@@ -75,13 +75,13 @@ export function HUD() {
               viewBox={`${WORLD_BOX.minLon} ${-WORLD_BOX.maxLat} ${WORLD_BOX.maxLon - WORLD_BOX.minLon} ${WORLD_BOX.maxLat - WORLD_BOX.minLat}`}
               className="w-full rounded-md"
             >
-              <rect x={WORLD_BOX.minLon} y={-WORLD_BOX.maxLat} width={360} height={WORLD_BOX.maxLat - WORLD_BOX.minLat} fill="#1b5e6b" />
-              {paths && <path d={paths} fill="#d9c9a3" stroke="none" />}
+              <rect x={WORLD_BOX.minLon} y={-WORLD_BOX.maxLat} width={360} height={WORLD_BOX.maxLat - WORLD_BOX.minLat} fill="var(--ink-2)" />
+              {paths && <path d={paths} fill="var(--sand)" stroke="none" />}
               {regions.map((r) => (
-                <circle key={r.key} cx={(r.min_lon + r.max_lon) / 2} cy={-(r.min_lat + r.max_lat) / 2} r={2.2} fill="#f4c95d" fillOpacity={0.7} />
+                <circle key={r.key} cx={(r.min_lon + r.max_lon) / 2} cy={-(r.min_lat + r.max_lat) / 2} r={2.2} fill="var(--gold)" fillOpacity={0.7} />
               ))}
-              <circle cx={rig.lon} cy={-rig.lat} r={4} fill="none" stroke="#1d4ed8" strokeWidth={1.6} />
-              <circle cx={rig.lon} cy={-rig.lat} r={1.2} fill="#1d4ed8" />
+              <circle cx={rig.lon} cy={-rig.lat} r={4} fill="none" stroke="var(--cobalt)" strokeWidth={1.6} />
+              <circle cx={rig.lon} cy={-rig.lat} r={1.2} fill="var(--cobalt)" />
             </svg>
             <p className="mt-1 font-mono text-[10px] text-[var(--graphite-3)]">
               {rig.lat.toFixed(1)}°, {rig.lon.toFixed(1)}°

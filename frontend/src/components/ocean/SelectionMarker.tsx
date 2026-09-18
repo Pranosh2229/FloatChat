@@ -8,6 +8,8 @@ import * as THREE from "three";
 import type { RegionSelection } from "./types";
 import { cameraRig } from "./worldCamera";
 import { bendMaterial } from "./worldCurvature";
+import { getWorldPalette } from "./worldTheme";
+import { useOceanStore } from "@/stores/oceanStore";
 
 interface SelectionMarkerProps {
   selection: RegionSelection;
@@ -22,6 +24,8 @@ interface SelectionMarkerProps {
 export function SelectionMarker({ selection, reducedMotion }: SelectionMarkerProps) {
   const groupRef = useRef<Group>(null);
   const ringRef = useRef<Mesh>(null);
+  const theme = useOceanStore((s) => s.theme);
+  const cobalt = getWorldPalette(theme).marker.cobalt;
 
   useFrame(({ clock }) => {
     groupRef.current?.scale.setScalar(THREE.MathUtils.clamp(cameraRig.distance / 3, 1, 6));
@@ -34,11 +38,11 @@ export function SelectionMarker({ selection, reducedMotion }: SelectionMarkerPro
     <group ref={groupRef} position={[selection.point[0], 0.05, selection.point[2]]}>
       <mesh rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[0.035, 24]} />
-        <meshBasicMaterial ref={bendMaterial} color="#1d4ed8" toneMapped={false} />
+        <meshBasicMaterial ref={bendMaterial} color={cobalt} toneMapped={false} />
       </mesh>
       <mesh ref={ringRef} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[0.05, 0.065, 32]} />
-        <meshBasicMaterial ref={bendMaterial} color="#1d4ed8" toneMapped={false} transparent opacity={0.8} />
+        <meshBasicMaterial ref={bendMaterial} color={cobalt} toneMapped={false} transparent opacity={0.8} />
       </mesh>
     </group>
   );

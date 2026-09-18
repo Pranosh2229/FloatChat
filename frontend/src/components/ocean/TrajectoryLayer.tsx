@@ -6,6 +6,7 @@ import { Instance, Instances } from "@react-three/drei";
 import { useOceanStore } from "@/stores/oceanStore";
 import { latLonToWorld } from "./geo";
 import { bendMaterial } from "./worldCurvature";
+import { getWorldPalette } from "./worldTheme";
 
 // Just above the animated wave surface so the path isn't swallowed by crests.
 const PATH_HEIGHT = 0.06;
@@ -20,6 +21,8 @@ const PATH_HEIGHT = 0.06;
 export function TrajectoryLayer() {
   const trajectory = useOceanStore((s) => s.trajectory);
   const currentTime = useOceanStore((s) => s.currentTime);
+  const theme = useOceanStore((s) => s.theme);
+  const cobalt = getWorldPalette(theme).marker.cobalt;
 
   const waypoints = useMemo(() => {
     if (!trajectory) return null;
@@ -49,12 +52,12 @@ export function TrajectoryLayer() {
           <bufferGeometry>
             <bufferAttribute attach="attributes-position" args={[linePositions, 3]} />
           </bufferGeometry>
-          <lineBasicMaterial ref={bendMaterial} color="#1d4ed8" transparent opacity={0.9} toneMapped={false} />
+          <lineBasicMaterial ref={bendMaterial} color={cobalt} transparent opacity={0.9} toneMapped={false} />
         </line>
       )}
       <Instances limit={waypoints.length} range={waypoints.length}>
         <sphereGeometry args={[0.012, 8, 8]} />
-        <meshBasicMaterial ref={bendMaterial} color="#1d4ed8" toneMapped={false} />
+        <meshBasicMaterial ref={bendMaterial} color={cobalt} toneMapped={false} />
         {waypoints.map((position, i) => (
           <Instance key={i} position={position} />
         ))}

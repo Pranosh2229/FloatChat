@@ -211,18 +211,27 @@ export function AskPanel() {
     if (askFocusRequest > 0) inputRef.current?.focus();
   }, [askFocusRequest]);
 
+  // Recent real questions first (most useful — genuinely re-askable, e.g. after Back restores
+  // the view they answered), then the same discovery-event/compare chips fill any remaining
+  // slots. Previously this was "history only once you've asked anything," which meant asking a
+  // single question shrank the chip row to just that one question, permanently, for the rest of
+  // the session — confirmed live as the exact bug reported ("back option, the previously asked
+  // question is only present and the other suggestions are not there").
   const suggestions = useMemo(() => {
-    if (askHistory.length > 0) return [...askHistory].reverse().slice(0, 4);
-    const seen = new Set<string>();
-    const out: string[] = [];
+    const out = [...askHistory].reverse().slice(0, 4);
+    const asked = new Set(out.map((q) => q.toLowerCase()));
+    const seenRegions = new Set<string>();
     for (const e of discoveryEvents) {
-      if (seen.has(e.region)) continue;
-      seen.add(e.region);
-      out.push(`What's unusual in the ${regionName(regions, e.region)}?`);
-      if (out.length === 3) break;
+      if (out.length >= 4) break;
+      if (seenRegions.has(e.region)) continue;
+      seenRegions.add(e.region);
+      const chip = `What's unusual in the ${regionName(regions, e.region)}?`;
+      if (asked.has(chip.toLowerCase())) continue;
+      out.push(chip);
     }
-    if (regions.length >= 2 && out.length < 4) {
-      out.push(`Compare ${regions[0].name} and ${regions[1].name}`);
+    if (out.length < 4 && regions.length >= 2) {
+      const chip = `Compare ${regions[0].name} and ${regions[1].name}`;
+      if (!asked.has(chip.toLowerCase())) out.push(chip);
     }
     return out;
   }, [askHistory, discoveryEvents, regions]);

@@ -7,6 +7,8 @@ import { TessellateModifier } from "three/examples/jsm/modifiers/TessellateModif
 import { loadCoastline, type LandPolygon } from "@/lib/coastline";
 import { WORLD_SCALE } from "./geo";
 import { bendMaterial } from "./worldCurvature";
+import { getWorldPalette } from "./worldTheme";
+import { useOceanStore } from "@/stores/oceanStore";
 
 // Land sits a hair above the wave crests so the coastline is never lapped over by the water
 // mesh, and the outline a hair above the land so it always draws on top.
@@ -74,6 +76,8 @@ const builtCache = new WeakMap<LandPolygon[], ReturnType<typeof buildLand>>();
  */
 export function LandLayer() {
   const [polygons, setPolygons] = useState<LandPolygon[] | null>(null);
+  const theme = useOceanStore((s) => s.theme);
+  const palette = getWorldPalette(theme);
 
   useEffect(() => {
     let cancelled = false;
@@ -100,10 +104,10 @@ export function LandLayer() {
   return (
     <group>
       <mesh geometry={built.geometry} raycast={() => {}} receiveShadow>
-        <meshStandardMaterial ref={bendMaterial} color="#d9c9a3" roughness={0.95} metalness={0} />
+        <meshStandardMaterial ref={bendMaterial} color={palette.land} roughness={0.95} metalness={0} />
       </mesh>
       <lineSegments geometry={built.outline} raycast={() => {}}>
-        <lineBasicMaterial ref={bendMaterial} color="#1a1a1a" transparent opacity={0.55} toneMapped={false} />
+        <lineBasicMaterial ref={bendMaterial} color={palette.landOutline} transparent opacity={0.55} toneMapped={false} />
       </lineSegments>
     </group>
   );

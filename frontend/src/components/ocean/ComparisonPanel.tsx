@@ -1,5 +1,6 @@
 import type { RegionStats } from "@/lib/api";
 import { COMPARE_HOW_TO_READ, COMPARE_WHY_DIFFERENT } from "@/lib/explainers";
+import { ExportMenu } from "@/components/ui/ExportMenu";
 
 interface ComparisonPanelProps {
   regionA: RegionStats;
@@ -45,6 +46,25 @@ function Versus({
  * `compare_regions` intent surfaces, drawn as opposing bars instead of a stat table.
  */
 export function ComparisonPanel({ regionA, regionB, onClose }: ComparisonPanelProps) {
+  const summaryText = [
+    `${regionA.name} vs ${regionB.name}`,
+    `Floats: ${regionA.float_count} vs ${regionB.float_count}`,
+    `Profiles: ${regionA.profile_count} vs ${regionB.profile_count}`,
+    regionA.mean_surface_temperature_c !== null && regionB.mean_surface_temperature_c !== null
+      ? `Surface temperature: ${regionA.mean_surface_temperature_c.toFixed(1)}°C vs ${regionB.mean_surface_temperature_c.toFixed(1)}°C`
+      : null,
+    regionA.mean_surface_salinity_psu !== null && regionB.mean_surface_salinity_psu !== null
+      ? `Surface salinity: ${regionA.mean_surface_salinity_psu.toFixed(1)} vs ${regionB.mean_surface_salinity_psu.toFixed(1)} PSU`
+      : null,
+  ].filter(Boolean).join("\n");
+
+  const csvRows = [
+    { metric: "Floats", [regionA.name]: regionA.float_count, [regionB.name]: regionB.float_count },
+    { metric: "Profiles", [regionA.name]: regionA.profile_count, [regionB.name]: regionB.profile_count },
+    { metric: "Surface temperature (°C)", [regionA.name]: regionA.mean_surface_temperature_c ?? "", [regionB.name]: regionB.mean_surface_temperature_c ?? "" },
+    { metric: "Surface salinity (PSU)", [regionA.name]: regionA.mean_surface_salinity_psu ?? "", [regionB.name]: regionB.mean_surface_salinity_psu ?? "" },
+  ];
+
   return (
     <div className="card rise pointer-events-auto w-[calc(100vw-2.5rem)] max-h-[calc(100dvh-var(--footer-h,21.25rem)-6.5rem)] overflow-y-auto p-5 [scrollbar-width:thin] sm:w-[26rem]">
       <div className="flex items-start justify-between">
@@ -54,9 +74,12 @@ export function ComparisonPanel({ regionA, regionB, onClose }: ComparisonPanelPr
             {regionA.name} <span className="italic text-[var(--graphite-3)]">vs</span> {regionB.name}
           </p>
         </div>
-        <button onClick={onClose} aria-label="Close comparison" className="btn btn-ghost !px-2 !py-1 !text-[11px]">
-          ✕
-        </button>
+        <div className="flex shrink-0 items-start gap-1.5">
+          <ExportMenu filename={`compare-${regionA.key}-${regionB.key}`} summary={summaryText} json={{ regionA, regionB }} csvRows={csvRows} />
+          <button onClick={onClose} aria-label="Close comparison" className="btn btn-ghost !px-2 !py-1 !text-[11px]">
+            ✕
+          </button>
+        </div>
       </div>
 
       <div className="mt-3 space-y-3">

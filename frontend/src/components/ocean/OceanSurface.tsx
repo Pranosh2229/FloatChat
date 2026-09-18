@@ -1,13 +1,18 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
 
 import { cameraRig, inputState } from "./worldCamera";
 import { worldToLatLon } from "./geo";
 import { waterMaterialProps } from "./waterShader";
+import { getWorldPalette, type WorldPalette } from "./worldTheme";
 import { useOceanStore } from "@/stores/oceanStore";
+
+// How long a day/night palette swap takes to settle — quick enough to read as a response to the
+// toggle, not a scene reload, slow enough not to be a jarring snap.
+const THEME_TRANSITION_S = 0.6;
 
 // Big enough to reach past the fog from the top band; dense enough that the smallest swell
 // (0.15 units) still has ~4 vertices per wavelength near the camera.
@@ -26,20 +31,53 @@ const CLICK_DRAG_THRESHOLD = 0.05;
  * drags into panning.
  */
 export function OceanSurface({ reducedMotion }: { reducedMotion: boolean }) {
+  const setRegionSelection = useOceanStore((s) => s.setRegionSelection);
+  const theme = useOceanStore((s) => s.theme);
+
   // Uniforms are mutated every frame (uTime) through the JSX ref, never through the props
-  // object itself — the React Compiler lint treats hook-returned values as immutable.
-  const [materialProps] = useState(() => waterMaterialProps());
+  // object itself — the React Compiler lint treats hook-returned values as immutable. Seeded
+  // with the CURRENT theme's palette (not always day): a fresh page load that restores dark mode
+  // from localStorage starts this component with `theme` already "dark", and since the tween
+  // below only fires on a *change*, a day-seeded material would otherwise never correct itself —
+  // confirmed live (water stayed teal on a dark-mode reload until this was fixed).
+  const [materialProps] = useState(() => waterMaterialProps(getWorldPalette(theme)));
   const materialRef = useRef<THREE.ShaderMaterial>(null);
   const waterRef = useRef<THREE.Mesh>(null);
-  const setRegionSelection = useOceanStore((s) => s.setRegionSelection);
 
   const dragStart = useRef<THREE.Vector3 | null>(null);
   const dragMoved = useRef(false);
   const pinchInterrupted = useRef(false);
 
+  // Day/night colour transition: a shader material's uniforms aren't re-diffed from JSX props
+  // (only `uTime` is meant to be mutated per-frame like this already), so a theme change starts
+  // a short lerp toward the new palette's colours/sun direction rather than replacing the
+  // material — the wave animation itself is completely untouched either way.
+  const themeTween = useRef<{ from: WorldPalette; t: number } | null>(null);
+  const prevPalette = useRef(getWorldPalette(theme));
+  useEffect(() => {
+    const next = getWorldPalette(theme);
+    if (next !== prevPalette.current) {
+      themeTween.current = { from: prevPalette.current, t: 0 };
+      prevPalette.current = next;
+    }
+  }, [theme]);
+
   useFrame((_, delta) => {
     const mat = materialRef.current;
     if (mat && !reducedMotion) mat.uniforms.uTime.value += delta;
+    if (mat) {
+      const tween = themeTween.current;
+      const target = getWorldPalette(theme);
+      if (tween) {
+        tween.t = Math.min(1, tween.t + delta / THEME_TRANSITION_S);
+        mat.uniforms.uDeep.value.copy(tween.from.water.deep).lerp(target.water.deep, tween.t);
+        mat.uniforms.uLit.value.copy(tween.from.water.lit).lerp(target.water.lit, tween.t);
+        mat.uniforms.uHorizon.value.copy(tween.from.water.horizon).lerp(target.water.horizon, tween.t);
+        mat.uniforms.uGlint.value.copy(tween.from.water.glint).lerp(target.water.glint, tween.t);
+        mat.uniforms.uSunDir.value.copy(tween.from.sunDirection).lerp(target.sunDirection, tween.t).normalize();
+        if (tween.t >= 1) themeTween.current = null;
+      }
+    }
     const water = waterRef.current;
     if (water) {
       water.position.x = Math.round(cameraRig.target.x / CELL) * CELL;

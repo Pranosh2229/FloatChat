@@ -115,6 +115,15 @@ interface OceanState {
   askFocusRequest: number;
   requestAskFocus: () => void;
 
+  // Dark mode (2026-09-19): a real toggle, not an OS-inherited `prefers-color-scheme` branch.
+  // Lives here (not component state) so the 3D Explore scene — a sibling of the nav, not a
+  // descendant — can also read it to swap the water/fog/lighting to a night palette. `ThemeInit`
+  // (mounted once in TopNav) is the only thing that reads/writes localStorage and the
+  // `data-theme` DOM attribute; everything else just reads `theme` reactively.
+  theme: "light" | "dark";
+  setTheme: (theme: "light" | "dark") => void;
+  toggleTheme: () => void;
+
   // Part 11: Discovery Mode — real detected events as an idle-state entry point, so a judge
   // has something to click before they've typed a single question.
   discoveryEvents: EventSummary[];
@@ -378,6 +387,13 @@ export const useOceanStore = create<OceanState>((set, get) => ({
   askHistory: [],
   askFocusRequest: 0,
   requestAskFocus: () => set((state) => ({ askFocusRequest: state.askFocusRequest + 1 })),
+
+  // Starts "light" (matches SSR/first paint) — ThemeInit corrects it from localStorage on
+  // mount, same deferred-effect pattern as FirstVisitHint's seen-before check, so there's never
+  // a synchronous mismatch between server and client render.
+  theme: "light",
+  setTheme: (theme) => set({ theme }),
+  toggleTheme: () => set((state) => ({ theme: state.theme === "dark" ? "light" : "dark" })),
 
   askQuestion: async (question) => {
     set((state) => ({

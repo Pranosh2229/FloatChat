@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const INK = "#1a1a1a";
+const INK = "var(--graphite)";
 const GOLD = "#f4c95d";
-const PAPER = "#f3ede0";
+const PAPER = "var(--paper)";
 const COBALT = "#1d4ed8";
 const CORAL = "#f0562f";
 const GREY = "#8a877f";

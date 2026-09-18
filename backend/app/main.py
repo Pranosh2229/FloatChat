@@ -5,6 +5,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.api.admin import router as admin_router
 from app.api.anomaly import router as anomaly_router
 from app.api.events import router as events_router
 from app.api.floats import router as floats_router
@@ -14,6 +15,11 @@ from app.api.query import router as query_router
 from app.api.regions import router as regions_router
 from app.config import get_settings
 from app.database import Base, engine
+from app.middleware.security import (
+    OriginCheckMiddleware,
+    RateLimitingMiddleware,
+    SecurityHeadersMiddleware,
+)
 from app.models import *  # noqa: F401,F403 -- registers all models on Base.metadata
 
 settings = get_settings()
@@ -38,6 +44,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(OriginCheckMiddleware)
+app.add_middleware(RateLimitingMiddleware)
+app.add_middleware(SecurityHeadersMiddleware)
 
 app.include_router(health_router)
 app.include_router(regions_router)
@@ -46,6 +55,7 @@ app.include_router(profiles_router)
 app.include_router(anomaly_router)
 app.include_router(events_router)
 app.include_router(query_router)
+app.include_router(admin_router)
 
 
 @app.exception_handler(Exception)

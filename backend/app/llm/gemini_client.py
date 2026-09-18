@@ -18,6 +18,7 @@ import json
 import httpx
 
 from app.config import get_settings
+from app.llm.spend_tracker import get_spend_tracker
 from app.ocean.regions import REGIONS
 from app.query.schema import LLMExtraction
 
@@ -153,15 +154,23 @@ async def extract(question: str, *, reference_date: dt.date | None = None) -> LL
     `LLMExtraction`. `reference_date` is exposed for tests that need deterministic relative-date
     resolution; production calls always use the real current date."""
     settings = get_settings()
+    tracker = get_spend_tracker()
+    if tracker.is_exceeded():
+        raise GeminiExtractionError("Daily Gemini call limit reached — try again after midnight UTC.")
+
     today = (reference_date or dt.date.today()).isoformat()
     system_prompt = SYSTEM_PROMPT_TEMPLATE.format(today=today, region_list=_REGION_LIST_TEXT)
 
     url = f"{GEMINI_API_BASE}/{settings.gemini_model}:generateContent"
+    tracker.record_call()
     async with httpx.AsyncClient(timeout=30.0) as client:
         try:
             response = await client.post(
                 url,
-                params={"key": settings.gemini_api_key},
+                # The key travels as a header, not a `?key=...` query param — query strings are
+                # routinely logged in full by proxies, load balancers and browser history, which
+                # would otherwise leak the key; Google's own client libraries use this same header.
+                headers={"x-goog-api-key": settings.gemini_api_key},
                 json={
                     "contents": [{"parts": [{"text": f'{system_prompt}\n\nQuestion: "{question}"'}]}],
                     "generationConfig": {
@@ -216,15 +225,20 @@ async def explain(question: str) -> str:
     and it is fenced to explanation only (no dataset numbers), keeping the "LLM never invents
     data" boundary intact."""
     settings = get_settings()
+    tracker = get_spend_tracker()
+    if tracker.is_exceeded():
+        raise GeminiExtractionError("Daily Gemini call limit reached — try again after midnight UTC.")
+
     prompt = EXPLAIN_PROMPT_TEMPLATE.format(
         region_names=", ".join(r["name"] for r in REGIONS.values()), question=question
     )
     url = f"{GEMINI_API_BASE}/{settings.gemini_model}:generateContent"
+    tracker.record_call()
     async with httpx.AsyncClient(timeout=30.0) as client:
         try:
             response = await client.post(
                 url,
-                params={"key": settings.gemini_api_key},
+                headers={"x-goog-api-key": settings.gemini_api_key},
                 json={
                     "contents": [{"parts": [{"text": prompt}]}],
                     "generationConfig": {"temperature": 0.4, "maxOutputTokens": 400},

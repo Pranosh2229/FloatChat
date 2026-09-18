@@ -7,6 +7,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { WORLD_SCALE, latLonToWorld, worldToLatLon } from "./geo";
 import { BANDS, applyRigToCamera, bandIndex, cameraRig, inputState, setNavigatorControls } from "./worldCamera";
 import { curvatureUniforms } from "./worldCurvature";
+import { getWorldPalette } from "./worldTheme";
 import { useOceanStore } from "@/stores/oceanStore";
 
 const BAND_TRANSITION_S = 1.1;
@@ -40,7 +41,6 @@ const WHEEL_PAN_SENSITIVITY = 0.0035;
 const TOUCH_PINCH_RATIO_THRESHOLD = 0.12;
 const PAN_SPEED_PER_DISTANCE = 0.6; // world units/s per unit of camera distance
 const BOUNDARY_PULL_PER_S = 2.5; // soft boundary: fraction of the overshoot recovered per second
-const FOG_COLOR = "#cfd6cf"; // pale warm horizon — the far sea fades into the paper, not into black
 
 interface Tween<T> {
   from: T;
@@ -90,6 +90,9 @@ export function WorldNavigator({ reducedMotion }: { reducedMotion: boolean }) {
   const clearFlyToTarget = useOceanStore((s) => s.clearFlyToTarget);
   const setAltitudeBand = useOceanStore((s) => s.setAltitudeBand);
   const pushView = useOceanStore((s) => s.pushView);
+  const theme = useOceanStore((s) => s.theme);
+  // Day/night horizon: the far sea fades into this colour, not into black, in either theme.
+  const fogColor = getWorldPalette(theme).fogColor;
 
   const keys = useRef(new Set<string>());
   const velocity = useRef(new THREE.Vector2());
@@ -428,8 +431,8 @@ export function WorldNavigator({ reducedMotion }: { reducedMotion: boolean }) {
 
   return (
     <>
-      <color attach="background" args={[FOG_COLOR]} />
-      <fog attach="fog" args={[FOG_COLOR, 1, 10]} />
+      <color attach="background" args={[fogColor]} />
+      <fog attach="fog" args={[fogColor, 1, 10]} />
     </>
   );
 }

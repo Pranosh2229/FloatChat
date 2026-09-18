@@ -12,6 +12,7 @@ import { AskPanel } from "@/components/ocean/AskPanel";
 import { WorldControls } from "@/components/ocean/WorldControls";
 import { HUD } from "@/components/ocean/HUD";
 import { FirstVisitHint } from "@/components/ocean/FirstVisitHint";
+import { ExploreSearch } from "@/components/ocean/ExploreSearch";
 import { useOceanStore } from "@/stores/oceanStore";
 
 export default function ExplorePage() {
@@ -144,8 +145,12 @@ export default function ExplorePage() {
         )}
       </aside>
 
-      {/* Right rail: whichever one thing is in focus. */}
-      <aside className="pointer-events-none absolute right-5 top-20 z-10 sm:right-8">{focusPanel}</aside>
+      {/* Right rail: the quick-jump search (always available) above whichever one thing is in
+          focus. */}
+      <aside className="pointer-events-none absolute right-5 top-20 z-10 flex flex-col items-end gap-3 sm:right-8">
+        <ExploreSearch />
+        {focusPanel}
+      </aside>
 
       {/* Bottom-left: map controls + the toggleable HUD (off by default). Wraps rather than
           running off the right edge if the HUD is opened on a narrow phone. */}

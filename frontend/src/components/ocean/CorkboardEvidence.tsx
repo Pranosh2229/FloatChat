@@ -121,20 +121,20 @@ export function CorkboardEvidence({ nodes }: { nodes: CorkNode[] }) {
                 width={104}
                 height={60}
                 rx={3}
-                fill="#fbf8f1"
-                stroke="#1a1a1a"
+                fill="var(--color-bg-elevated)"
+                stroke="var(--graphite)"
                 strokeOpacity={0.25}
                 strokeWidth={1}
                 style={{ filter: "drop-shadow(0 3px 3px rgba(26,26,26,0.25))" }}
               />
-              <circle cy={-30} r={4} fill="#8a2b1a" stroke="#1a1a1a" strokeWidth={0.6} />
-              <text x={0} y={-10} textAnchor="middle" fontFamily="var(--font-geist-mono)" fontSize={9} fill="#8a877f" letterSpacing={0.5}>
+              <circle cy={-30} r={4} fill="#8a2b1a" stroke="var(--graphite)" strokeWidth={0.6} />
+              <text x={0} y={-10} textAnchor="middle" fontFamily="var(--font-geist-mono)" fontSize={9} fill="var(--graphite-3)" letterSpacing={0.5}>
                 {node.label.toUpperCase()}
               </text>
-              <text x={0} y={10} textAnchor="middle" fontFamily="var(--font-display)" fontSize={22} fill="#1a1a1a">
+              <text x={0} y={10} textAnchor="middle" fontFamily="var(--font-display)" fontSize={22} fill="var(--graphite)">
                 {node.value}
               </text>
-              <text x={0} y={23} textAnchor="middle" fontFamily="var(--font-geist-sans)" fontSize={8} fill="#4a4a48">
+              <text x={0} y={23} textAnchor="middle" fontFamily="var(--font-geist-sans)" fontSize={8} fill="var(--graphite-2)">
                 {node.caption}
               </text>
               {canAdvance && (
@@ -143,7 +143,7 @@ export function CorkboardEvidence({ nodes }: { nodes: CorkNode[] }) {
                 </circle>
               )}
               {canAdvance && (
-                <text x={46} y={27} textAnchor="middle" fontSize={9} fill="#fbf8f1" pointerEvents="none">
+                <text x={46} y={27} textAnchor="middle" fontSize={9} fill="var(--color-bg-elevated)" pointerEvents="none">
                   +
                 </text>
               )}

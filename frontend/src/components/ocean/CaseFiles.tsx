@@ -46,15 +46,15 @@ function MiniMap({
 
   return (
     <svg viewBox={`${box.minLon} ${-box.maxLat} ${w} ${h}`} className="h-full w-full" preserveAspectRatio="xMidYMid slice">
-      <rect x={box.minLon} y={-box.maxLat} width={w} height={h} fill="#1b5e6b" />
-      {paths && <path d={paths} fill="#d9c9a3" stroke="#1a1a1a" strokeWidth={w / 220} strokeOpacity={0.5} />}
+      <rect x={box.minLon} y={-box.maxLat} width={w} height={h} fill="var(--ink-2)" />
+      {paths && <path d={paths} fill="var(--sand)" stroke="var(--graphite)" strokeWidth={w / 220} strokeOpacity={0.5} />}
       <rect
         x={region.min_lon}
         y={-region.max_lat}
         width={region.max_lon - region.min_lon}
         height={region.max_lat - region.min_lat}
         fill="none"
-        stroke="#f3ede0"
+        stroke="var(--paper)"
         strokeWidth={w / 260}
         strokeDasharray={`${w / 60} ${w / 90}`}
         opacity={0.8}
@@ -65,14 +65,14 @@ function MiniMap({
           y={-extent.max_lat}
           width={Math.max(extent.max_lon - extent.min_lon, w / 40)}
           height={Math.max(extent.max_lat - extent.min_lat, h / 40)}
-          fill="#f0562f"
+          fill="var(--coral)"
           fillOpacity={0.35}
-          stroke="#f0562f"
+          stroke="var(--coral)"
           strokeWidth={w / 160}
         />
       )}
       {floatPositions.map((p, i) => (
-        <circle key={i} cx={p.lon} cy={-p.lat} r={w / 70} fill="#f4c95d" stroke="#1a1a1a" strokeWidth={w / 400} />
+        <circle key={i} cx={p.lon} cy={-p.lat} r={w / 70} fill="var(--gold)" stroke="var(--graphite)" strokeWidth={w / 400} />
       ))}
     </svg>
   );

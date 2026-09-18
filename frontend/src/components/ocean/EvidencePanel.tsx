@@ -3,6 +3,7 @@
 import type { EventSummary, EvidenceOut } from "@/lib/api";
 import { BASELINE_WHAT, EVENT_EXPLAINERS, HONESTY_LINE } from "@/lib/explainers";
 import { useOceanStore } from "@/stores/oceanStore";
+import { ExportMenu } from "@/components/ui/ExportMenu";
 import { CorkboardEvidence, type CorkNode } from "./CorkboardEvidence";
 
 interface EvidencePanelProps {
@@ -73,6 +74,19 @@ export function EvidencePanel({ event, evidence, onClose }: EvidencePanelProps) 
   const temp = evidence.calculation.temperature;
   const sal = evidence.calculation.salinity;
 
+  const summaryText = [
+    `Case file #${event.id} — ${ex?.title ?? event.type} — ${region}`,
+    `${event.depth_min.toFixed(0)}-${event.depth_max.toFixed(0)} m · ${days} day${days === 1 ? "" : "s"} · starting ${new Date(event.start_time).toLocaleDateString()}`,
+    temp ? `Temperature: ${temp.mean_observed.toFixed(2)}°C observed vs ${temp.mean_expected.toFixed(2)}°C expected (${temp.mean_anomaly >= 0 ? "+" : ""}${temp.mean_anomaly.toFixed(2)}°C anomaly)` : null,
+    sal ? `Salinity: ${sal.mean_observed.toFixed(2)} PSU observed vs ${sal.mean_expected.toFixed(2)} PSU expected (${sal.mean_anomaly >= 0 ? "+" : ""}${sal.mean_anomaly.toFixed(2)} PSU anomaly)` : null,
+    `${evidence.float_ids.length} float${evidence.float_ids.length === 1 ? "" : "s"}, ${evidence.profile_ids.length} profiles, ${evidence.observation_ids.length} flagged readings, vs baseline ${evidence.baseline_id}`,
+  ].filter(Boolean).join("\n");
+
+  const csvRows = [
+    temp && { metric: "Temperature (°C)", observed: temp.mean_observed, expected: temp.mean_expected, anomaly: temp.mean_anomaly },
+    sal && { metric: "Salinity (PSU)", observed: sal.mean_observed, expected: sal.mean_expected, anomaly: sal.mean_anomaly },
+  ].filter((row): row is { metric: string; observed: number; expected: number; anomaly: number } => Boolean(row));
+
   const corkNodes: CorkNode[] = [
     {
       id: "conclusion",
@@ -111,9 +125,12 @@ export function EvidencePanel({ event, evidence, onClose }: EvidencePanelProps) 
             {new Date(event.start_time).toLocaleDateString(undefined, { month: "short", year: "numeric" })}
           </p>
         </div>
-        <button onClick={onClose} aria-label="Close case file" className="btn btn-ghost !px-2 !py-1 !text-[11px]">
-          ✕
-        </button>
+        <div className="flex shrink-0 items-start gap-1.5">
+          <ExportMenu filename={`case-${event.id}`} summary={summaryText} json={{ event, evidence }} csvRows={csvRows} />
+          <button onClick={onClose} aria-label="Close case file" className="btn btn-ghost !px-2 !py-1 !text-[11px]">
+            ✕
+          </button>
+        </div>
       </div>
 
       {ex && (

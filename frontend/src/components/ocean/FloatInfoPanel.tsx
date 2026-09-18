@@ -7,6 +7,7 @@ import {
   depthMeaning,
 } from "@/lib/explainers";
 import { DepthProfileChart } from "./DepthProfileChart";
+import { ExportMenu } from "@/components/ui/ExportMenu";
 
 const DATA_MODE_LABELS: Record<string, string> = {
   R: "Real-time",
@@ -42,9 +43,9 @@ function JourneySketch({ trajectory }: { trajectory: TrajectoryResponse | null }
   const last = trajectory.points[trajectory.points.length - 1];
   return (
     <svg viewBox={`${box.x} ${box.y} ${box.w} ${box.h}`} className="h-28 w-full rounded-md bg-[var(--paper-2)]">
-      <path d={d} fill="none" stroke="#1d4ed8" strokeWidth={span / 90} strokeLinejoin="round" />
-      <circle cx={first.longitude} cy={-first.latitude} r={span / 50} fill="#f3ede0" stroke="#1a1a1a" strokeWidth={span / 250} />
-      <circle cx={last.longitude} cy={-last.latitude} r={span / 40} fill="#f4c95d" stroke="#1a1a1a" strokeWidth={span / 200} />
+      <path d={d} fill="none" stroke="var(--cobalt)" strokeWidth={span / 90} strokeLinejoin="round" />
+      <circle cx={first.longitude} cy={-first.latitude} r={span / 50} fill="var(--paper)" stroke="var(--graphite)" strokeWidth={span / 250} />
+      <circle cx={last.longitude} cy={-last.latitude} r={span / 40} fill="var(--gold)" stroke="var(--graphite)" strokeWidth={span / 200} />
     </svg>
   );
 }
@@ -77,6 +78,20 @@ export function FloatInfoPanel({
       ? Math.max(1, Math.round((new Date(float.latest_time).getTime() - new Date(first.timestamp).getTime()) / (30 * 86400000)))
       : null;
 
+  const summaryText = [
+    `ARGO float ${float.wmo_id}`,
+    `Now at ${float.latest_lat.toFixed(2)}°, ${float.latest_lon.toFixed(2)}° · last heard ${new Date(float.latest_time).toLocaleDateString()}`,
+    profiles !== null ? `${profiles} profiles over ${months} month${months === 1 ? "" : "s"}${drift !== null ? `, drifted about ${Math.round(drift)} km` : ""}` : null,
+    latestProfile ? `Latest dive: ${latestProfile.pressure_dbar.length} readings down to ${Math.max(...latestProfile.pressure_dbar).toFixed(0)} m` : null,
+  ].filter(Boolean).join("\n");
+
+  const csvRows = trajectory?.points.map((p) => ({
+    timestamp: p.timestamp,
+    latitude: p.latitude,
+    longitude: p.longitude,
+    profile_id: p.profile_id,
+  }));
+
   return (
     <div className="card rise pointer-events-auto w-[calc(100vw-2.5rem)] max-h-[calc(100dvh-var(--footer-h,21.25rem)-6.5rem)] overflow-y-auto p-5 [scrollbar-width:thin] sm:w-[26rem]">
       <div className="flex items-start justify-between">
@@ -84,9 +99,12 @@ export function FloatInfoPanel({
           <p className="eyebrow">ARGO float · ID {float.wmo_id}</p>
           <p className="font-display text-[28px] leading-none">One robot, reporting from the sea.</p>
         </div>
-        <button onClick={onClose} aria-label="Close float details" className="btn btn-ghost !px-2 !py-1 !text-[11px]">
-          ✕
-        </button>
+        <div className="flex shrink-0 items-start gap-1.5">
+          <ExportMenu filename={`float-${float.wmo_id}`} summary={summaryText} json={{ float, trajectory, latestProfile }} csvRows={csvRows} />
+          <button onClick={onClose} aria-label="Close float details" className="btn btn-ghost !px-2 !py-1 !text-[11px]">
+            ✕
+          </button>
+        </div>
       </div>
 
       <p className="mt-3 text-[13px] leading-relaxed text-[var(--graphite-2)]">{ARGO_FLOAT_WHAT}</p>

@@ -111,8 +111,8 @@ export function DepthProfileChart({
         {/* depth gridlines */}
         {depthTicks.map((d) => (
           <g key={d}>
-            <line x1={PAD_LEFT} x2={W - PAD_RIGHT} y1={y(d)} y2={y(d)} stroke="#1a1a1a" strokeOpacity={0.08} strokeWidth={1} />
-            <text x={4} y={y(d) + 3} fontFamily="var(--font-geist-mono)" fontSize={8} fill="#8a877f">
+            <line x1={PAD_LEFT} x2={W - PAD_RIGHT} y1={y(d)} y2={y(d)} stroke="var(--graphite)" strokeOpacity={0.08} strokeWidth={1} />
+            <text x={4} y={y(d) + 3} fontFamily="var(--font-geist-mono)" fontSize={8} fill="var(--graphite-3)">
               {Math.round(d)}
             </text>
           </g>
@@ -133,9 +133,9 @@ export function DepthProfileChart({
         <path d={path} fill="none" stroke="var(--cobalt)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
 
         {/* scrub line + dot */}
-        <line x1={PAD_LEFT} x2={W - PAD_RIGHT} y1={y(activeDepth)} y2={y(activeDepth)} stroke="#1a1a1a" strokeOpacity={0.35} strokeDasharray="3 3" />
+        <line x1={PAD_LEFT} x2={W - PAD_RIGHT} y1={y(activeDepth)} y2={y(activeDepth)} stroke="var(--graphite)" strokeOpacity={0.35} strokeDasharray="3 3" />
         {activeTemp !== null && (
-          <circle cx={x(activeTemp)} cy={y(activeDepth)} r={4} fill="var(--gold)" stroke="#1a1a1a" strokeWidth={1.5} />
+          <circle cx={x(activeTemp)} cy={y(activeDepth)} r={4} fill="var(--gold)" stroke="var(--graphite)" strokeWidth={1.5} />
         )}
       </svg>
 

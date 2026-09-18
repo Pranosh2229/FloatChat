@@ -26,6 +26,19 @@ class Settings(BaseSettings):
 
     cors_origins: list[str] = ["http://localhost:3000"]
 
+    # Caps how many real Gemini calls this process will make in a UTC day (app/llm/spend_tracker.py)
+    # — a free-tier key has a hard daily quota regardless, but this stops a bug (a retry loop, a
+    # scripted stress test) from silently burning through it before anyone notices.
+    gemini_daily_call_limit: int = 300
+
+    # Requests/minute per client IP before a 429 (app/middleware/security.py's RateLimitingMiddleware).
+    rate_limit_per_minute: int = 120
+
+    # Gates /admin/* (app/api/admin.py). Deliberately no default value: an empty key means the
+    # admin API refuses every request rather than falling back to a guessable default — a real
+    # key must be set explicitly via ADMIN_API_KEY in a deployed environment's env, never committed.
+    admin_api_key: str = ""
+
 
 @lru_cache
 def get_settings() -> Settings:
