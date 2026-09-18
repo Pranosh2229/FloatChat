@@ -1,0 +1,36 @@
+name: Refresh ocean data
+
+# Keeps the deployed database current without anyone running the ingestion scripts by hand:
+# pulls the latest ARGO profiles and satellite SST, then rebuilds detected events against them.
+# See backend/scripts/refresh_data.py for what actually runs.
+on:
+  schedule:
+    # Every Monday at 03:00 UTC. Real ARGO/SST sources update at most daily, so weekly is enough
+    # to stay current without hammering them — change the cron expression to run more/less often.
+    - cron: "0 3 * * 1"
+  workflow_dispatch: {} # lets you trigger a refresh manually from the Actions tab
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90 # a full 24-month/11-region run can take a while; ingestion is idempotent
+    # so a timeout just means "pick it up again next scheduled run," never lost or duplicated data.
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: pip install -r requirements.txt
+
+      - name: Refresh ARGO + SST + detected events
+        working-directory: backend
+        env:
+          # Set this as a repo secret (Settings -> Secrets and variables -> Actions) pointing at
+          # the deployed Postgres/PostGIS database — e.g. Render's external connection string.
+          # No Gemini key needed here: ingestion and event detection never call the LLM.
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python scripts/refresh_data.py
