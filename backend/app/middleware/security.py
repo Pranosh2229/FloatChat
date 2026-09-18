@@ -39,6 +39,11 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
         for key, value in SECURITY_HEADERS.items():
             response.headers[key] = value
+        # HSTS only outside development: over plain http (every local dev setup) a browser that
+        # remembers this would force https on localhost too, breaking dev — it only makes sense
+        # once the deployed backend is actually served over https.
+        if get_settings().environment != "development":
+            response.headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains"
         return response
 
 

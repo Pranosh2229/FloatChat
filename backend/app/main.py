@@ -35,7 +35,17 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title=settings.app_name, lifespan=lifespan)
+# Swagger/ReDoc/the raw OpenAPI JSON list every route — including /admin/*'s shape — to anyone
+# who requests them, in every environment, by default. Fine for local development; unnecessary
+# information disclosure once this is actually deployed, so they're off outside "development".
+docs_enabled = settings.environment == "development"
+app = FastAPI(
+    title=settings.app_name,
+    lifespan=lifespan,
+    docs_url="/docs" if docs_enabled else None,
+    redoc_url="/redoc" if docs_enabled else None,
+    openapi_url="/openapi.json" if docs_enabled else None,
+)
 
 app.add_middleware(
     CORSMiddleware,
